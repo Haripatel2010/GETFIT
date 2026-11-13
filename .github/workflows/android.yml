@@ -36,9 +36,12 @@ jobs:
           gradle-version: '8.11.1'
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace --info
+        run: |
+          set -o pipefail
+          gradle assembleDebug --stacktrace --info 2>&1 | tee build.log | grep -i -B 5 -A 8 -E "SAXParseException|Caused by:|error:|AndroidManifest" | head -100
 
       - name: Upload GETFIT APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: GETFIT-debug-apk
